@@ -1,0 +1,12 @@
+# @file .hadolint.yaml
+# @brief Конфигурация Hadolint для проверки Dockerfile.
+---
+ignored:
+  - DL3008
+trustedRegistries:
+  - docker.io
+  - ghcr.io
+severity:
+  DL3000: error
+  DL3002: error
+  DL3020: error

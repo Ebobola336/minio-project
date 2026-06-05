@@ -1,0 +1,44 @@
+# @file prometheus.yml
+# @brief Конфигурация Prometheus для сбора метрик кластера MinIO.
+# @author Тимошенко (заполнить ФИО)
+# @date 2025-05-25
+# @version 1.0.0
+
+---
+global:
+  # Интервал скрейпинга по умолчанию
+  scrape_interval: 15s
+  # Таймаут одного скрейпа
+  scrape_timeout: 10s
+  # Интервал вычисления recording rules
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Самомониторинг Prometheus
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Метрики MinIO нод (все 4 ноды)
+  - job_name: "minio"
+    metrics_path: /minio/v2/metrics/cluster
+    scheme: http
+    static_configs:
+      - targets:
+          - "minio1:9000"
+          - "minio2:9000"
+          - "minio3:9000"
+          - "minio4:9000"
+        labels:
+          cluster: "minio-erasure-code"
+
+  # Метрики отдельных нод MinIO (node-level)
+  - job_name: "minio-node"
+    metrics_path: /minio/v2/metrics/node
+    scheme: http
+    static_configs:
+      - targets:
+          - "minio1:9000"
+          - "minio2:9000"
+          - "minio3:9000"
+          - "minio4:9000"

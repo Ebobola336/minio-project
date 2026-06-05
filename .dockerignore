@@ -1,0 +1,26 @@
+# Служебные директории Git и CI
+.git
+.github
+
+# Академическая документация
+thesis/
+docs/
+*.md
+LICENSE.txt
+
+# Секреты и конфигурации для хоста
+.env
+secrets/
+*.pem
+*.key
+
+# Кэш и виртуальные окружения
+.venv
+venv
+__pycache__
+.pytest_cache
+deploy/scripts/tests
+
+# Архивы
+*.zip
+*.tar.gz

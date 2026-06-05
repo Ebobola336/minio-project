@@ -1,0 +1,8 @@
+site_name: MinIO Object Storage — Документация курсового проекта
+theme:
+  name: material
+docs_dir: docs
+nav:
+  - Главная: ../README.md
+  - Архитектура: architecture.md
+  - Развёртывание: deployment.md

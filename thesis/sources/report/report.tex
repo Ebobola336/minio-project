@@ -1,0 +1,101 @@
+% @file report.tex
+% @brief Пояснительная записка курсового проекта №18 «MinIO Object Storage».
+% @author Тимошенко (заполнить ФИО)
+% @date 2025-05-25
+% @version 1.0.0
+
+\documentclass[14pt,a4paper]{extreport}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{geometry}
+
+\geometry{
+  a4paper,
+  left=30mm, right=15mm,
+  top=20mm, bottom=20mm
+}
+
+\title{Пояснительная записка\\к курсовому проекту №18\\
+\large Развёртывание и настройка распределённого хранилища объектов MinIO}
+\author{Тимошенко (заполнить ФИО)}
+\date{2025}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\chapter{Введение}
+
+Актуальность: рост объёмов неструктурированных данных требует масштабируемых объектных
+хранилищ с поддержкой S3-совместимого API. MinIO — лидирующее open-source решение класса
+Self-Hosted Object Storage.
+
+Цель работы: развернуть и настроить производственный кластер MinIO с обеспечением
+отказоустойчивости (Erasure Code), безопасности (TLS, Docker Secrets) и наблюдаемости
+(Prometheus + Grafana).
+
+\chapter{Анализ существующих решений}
+
+\section{Сравнительный анализ}
+
+Для реализации объектного хранилища рассматривались два подхода:
+\begin{enumerate}
+  \item \textbf{MinIO} — S3-совместимое хранилище с нативной поддержкой Erasure Code,
+        развёртывание через Docker, встроенные метрики Prometheus.
+  \item \textbf{Ceph RADOS Gateway} — распределённая СХД, поддерживает S3 API,
+        но требует значительно больших ресурсов и экспертизы для настройки.
+\end{enumerate}
+
+\textbf{Выбор: MinIO} обоснован минимальными требованиями к ресурсам,
+полной совместимостью с AWS S3 SDK и простой интеграцией с Docker Compose.
+
+\chapter{Архитектура решения}
+
+Кластер состоит из 4 нод MinIO в режиме Erasure Code (8 дисков = 4$\times$2).
+Трафик терминируется на Nginx с TLS. Мониторинг — Prometheus + Grafana.
+
+\chapter{Описание компонентов}
+
+\section{MinIO Erasure Code Cluster}
+Четыре контейнера minio1--minio4 образуют единый кластер с алгоритмом Reed-Solomon.
+Кластер переживает одновременный выход из строя до 4 дисков (n/2).
+
+\section{Nginx TLS Proxy}
+Nginx выполняет TLS-терминацию и балансировку нагрузки методом \texttt{least\_conn}.
+
+\section{Мониторинг}
+Prometheus собирает метрики с эндпоинта \texttt{/minio/v2/metrics/cluster}.
+Grafana визуализирует дашборды, хранящиеся в Git как JSON.
+
+\chapter{Процесс развёртывания}
+
+Развёртывание одной командой:
+\begin{verbatim}
+sudo bash deploy/scripts/bootstrap.sh
+cp .env.example .env && nano .env
+cd deploy && docker compose up -d --build
+\end{verbatim}
+
+\chapter{Результаты тестирования}
+
+Тестирование включает:
+\begin{itemize}
+  \item Проверку healthcheck всех контейнеров (\texttt{test\_healthcheck.sh})
+  \item Интеграционные тесты доступности API (\texttt{test\_minio.sh})
+  \item HA-тест: отключение одной ноды при сохранении доступности кластера
+\end{itemize}
+
+\chapter{Заключение}
+
+Разработана и развёрнута полноценная инфраструктура объектного хранилища MinIO.
+Достигнуты все цели: отказоустойчивость (Erasure Code), безопасность (TLS, Docker Secrets,
+hardening ядра), наблюдаемость (Prometheus, Grafana). Вся инфраструктура разворачивается
+из репозитория одной командой.
+
+\end{document}

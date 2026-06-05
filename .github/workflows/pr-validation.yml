@@ -1,0 +1,66 @@
+# @file pr-validation.yml
+# @brief Конвейер автоматической проверки Pull Request (линтеры + тесты).
+# @author Тимошенко (заполнить ФИО)
+# @date 2025-05-25
+# @license GNU GPLv3
+
+name: PR Validation — Lint and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-validate:
+    name: Lint All Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Lint Bash Scripts (ShellCheck)
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: "./deploy/scripts"
+          severity: error
+
+      - name: Lint Dockerfiles (Hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: deploy/docker/nginx-proxy/Dockerfile
+          config: .github/linters/.hadolint.yaml
+
+      - name: Lint YAML Files (yamllint)
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .github/linters/.yamllint
+          file_or_dir: "deploy/docker-compose.yml config/"
+
+      - name: Validate Docker Compose Syntax
+        run: |
+          docker compose -f deploy/docker-compose.yml config --quiet
+          echo "docker-compose.yml синтаксически корректен."
+
+  run-tests:
+    name: Run Infrastructure Tests
+    runs-on: ubuntu-latest
+    needs: lint-and-validate
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check test scripts exist
+        run: |
+          test -f deploy/scripts/tests/test_minio.sh || (echo "test_minio.sh not found" && exit 1)
+          test -f deploy/scripts/tests/test_healthcheck.sh || (echo "test_healthcheck.sh not found" && exit 1)
+          echo "Тестовые скрипты найдены."
+
+      - name: Verify Scripts Are Executable
+        run: |
+          bash -n deploy/scripts/bootstrap.sh
+          bash -n deploy/scripts/tests/test_minio.sh
+          bash -n deploy/scripts/tests/test_healthcheck.sh
+          echo "Синтаксис bash-скриптов корректен."

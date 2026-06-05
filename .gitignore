@@ -1,0 +1,53 @@
+# Секреты и переменные окружения (КРИТИЧНО!)
+.env
+.env.production
+.env.local
+secrets/
+*.pem
+*.key
+certs/
+
+# ОС
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Логи
+*.log
+logs/
+*.pid
+*.sock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.toc
+*.blg
+*.bbl
+*.out
+thesis/sources/report/*.pdf
+thesis/sources/slides/*.pdf
+
+# Архивы
+*.zip
+*.tar.gz
+*.tgz
+*.rar

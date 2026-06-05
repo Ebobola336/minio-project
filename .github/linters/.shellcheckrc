@@ -1,0 +1,5 @@
+# @file .shellcheckrc
+# @brief Конфигурация ShellCheck для проверки Bash-скриптов.
+shell=bash
+enable=all
+disable=SC1090,SC2155

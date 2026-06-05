@@ -1,0 +1,17 @@
+# @file dashboards.yml
+# @brief Декларативная настройка автоимпорта дашбордов Grafana из JSON-файлов.
+# @author Тимошенко (заполнить ФИО)
+# @date 2025-05-25
+
+---
+apiVersion: 1
+
+providers:
+  - name: MinIO Dashboards
+    folder: MinIO
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/provisioning/dashboards

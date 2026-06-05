@@ -1,0 +1,18 @@
+# @file prometheus.yml
+# @brief Декларативная настройка источника данных Prometheus для Grafana (IaC).
+# @author Тимошенко (заполнить ФИО)
+# @date 2025-05-25
+
+---
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      httpMethod: POST
+      prometheusType: Prometheus
+      prometheusVersion: 2.54.1

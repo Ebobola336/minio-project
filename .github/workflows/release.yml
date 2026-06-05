@@ -1,0 +1,43 @@
+# @file release.yml
+# @brief Сборка релиза и публикация отчётных PDF при создании Git-тега.
+
+name: Create Production Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Verify Academic Deliverables
+        run: |
+          if [ ! -f "thesis/report.pdf" ]; then
+            echo "ERROR: thesis/report.pdf не найден!" && exit 1
+          fi
+          if [ ! -f "thesis/slides.pdf" ]; then
+            echo "ERROR: thesis/slides.pdf не найден!" && exit 1
+          fi
+          echo "Академические артефакты найдены."
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body: |
+            ## Релиз курсового проекта MinIO ${{ github.ref_name }}
+            Автоматическая верификация артефактов пройдена успешно.
+          files: |
+            thesis/report.pdf
+            thesis/slides.pdf
