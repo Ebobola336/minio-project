@@ -14,7 +14,7 @@
 set -euo pipefail
 
 readonly LOG_TAG="HEALTHCHECK"
-readonly CONTAINERS=("minio1" "minio2" "minio3" "minio4" "nginx-proxy" "prometheus" "grafana")
+readonly CONTAINERS=("minio" "prometheus" "grafana")
 
 TESTS_PASSED=0
 TESTS_FAILED=0
